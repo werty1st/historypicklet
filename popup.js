@@ -1,37 +1,48 @@
 import { h, Component, render } from 'https://unpkg.com/preact?module';
+import register from 'https://unpkg.com/preact-custom-element?module';
+
+
 import htm from 'https://unpkg.com/htm?module';
 
 // Initialize htm with Preact
 const html = htm.bind(h);
 
-function App (props) {
-  return html`<h1>Hello ${props.name}!</h1>`;
+class HistoryElement extends Component {
+
+    static tagName = 'history-element';
+    static observedAttributes = ['scmsid','lead-paragraph', 'title'];
+
+    onClick = e => {       
+        window.opener.postMessage( JSON.stringify( { message: "reload", id: this.props.scmsid   } )  ,  "https://www.zdf.de/");
+    }
+
+    render({ scmsid, title, leadParagraph }) {
+
+        if (!title) title="loading...";
+        return html`<li onClick=${ this.onClick } >
+        <a href="#"> ${title} </a>
+        </li>`;
+    }
 }
+  
 
-render(html`<${App} name="World" />`, document.body);
-
-
-
+register(HistoryElement);
 
 
 
 
-
-async function history(payload){
+async function history(historyItem, externalId){
     
-    const DEBUG=true;
-    const data = DEBUG?JSON.parse(payload.history).slice(0,4):JSON.parse(payload.history);
+    const data = JSON.parse(historyItem);
 
     const ul = document.getElementById("historylist");
 
-    for (let item of data){
+    let li = document.createElement("history-element");
+    li.setAttribute("scmsid", externalId);
+    li.setAttribute("lead-paragraph", data.leadParagraph);
+    li.setAttribute("title", data.title);
+    ul.appendChild(li);
 
-        let li = document.createElement("history-element");
-        li.setAttribute("scmsId", item.externalId);
-        ul.appendChild(li);
-    }
-
-    console.log(data);
 }
 
 
@@ -43,7 +54,7 @@ function installListener(){
             if ( event.origin == "https://www.zdf.de" ) {
 
                 if ( event.data.history ){
-                    history(event.data);                    
+                    history(event.data.history, event.data.externalId);                    
                 }
 
 
@@ -53,7 +64,7 @@ function installListener(){
 
         document.addEventListener("DOMContentLoaded", function() {
             //JSON data for message
-            window.opener.postMessage("ready",  "https://www.zdf.de/");
+            window.opener.postMessage(  JSON.stringify({ message: "ready" }),  "https://www.zdf.de/");
         });
 
         console.log("listener installed");
