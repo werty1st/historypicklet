@@ -1,1 +1,1 @@
-var s=document.createElement("script");s.src="https://github.com/app.js",s.type="module",document.head.appendChild(s);
+var s=document.createElement("script");s.src="https://werty1st.github.io/historypicklet/dist/app.js",s.type="module",document.head.appendChild(s);
