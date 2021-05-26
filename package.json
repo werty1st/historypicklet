@@ -2,18 +2,35 @@
   "name": "historypicklet",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app/app.js",
   "scripts": {
-    "lt": "ssh -N -R 5000:localhost:5000 root@192.168.81.254",
-    "serve": "serve",
-    "remote": "(npm run lt) & (npm run nodemon)",
-    "nodemon": "nodemon --watch '*.js' --exec 'npm run serve'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "esbuild": "esbuild",
+    "serve": "serve -n -C build",
+    "nodemon": "nodemon",
+
+    "clean": "rm -rf build",
+
+    "debug": "nodemon --watch package.json --watch 'app/**/*' -e ts,js,html --exec 'npm run debug_build & npm run serve'",
+    "debug_build": "npm run clean && npm run _debug1 && npm run _debug2 && npm run _loader_dev",
+    
+    "_debug1": "esbuild --define:process.env.URL=\\\"${npm_config_urldev}\\\" app/app.ts app/*.html --loader:.html=file  --outdir=build --outbase=app --bundle --sourcemap",
+    "_debug2": "esbuild --define:process.env.URL=\\\"${npm_config_urldev}\\\" app/popup.ts                               --outdir=build --outbase=app",
+    
+     "_loader_dev": "esbuild  --minify --define:process.env.URL=\\\"${npm_config_urldev}\\\" app/loader/*.ts --outdir=build --outbase=app",
+     "_loader_prod": "esbuild --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/loader/*.ts --outdir=build --outbase=app",
+    
+    "_build_payload1": "esbuild --bundle --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/app.ts app/*.html --loader:.html=file  --outdir=build --outbase=app",
+    "_build_payload2": "esbuild --bundle --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/popup.ts --outdir=build --outbase=app",
+
+    "build": "npm run clean && npm run _loader_prod & npm run _build_payload1 & npm run _build_payload2",
+    "lt": "ssh -N -R 5000:localhost:5000 ${npm_config_target}"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
+    "esbuild": "^0.12.3",
     "nodemon": "^2.0.7",
+    "replace-in-file": "^6.2.0",
     "serve": "^11.3.2"
   }
 }

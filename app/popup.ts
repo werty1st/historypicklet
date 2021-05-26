@@ -1,8 +1,7 @@
 import { h, Component, render } from 'https://unpkg.com/preact?module';
 import register from 'https://unpkg.com/preact-custom-element?module';
-
-
 import htm from 'https://unpkg.com/htm?module';
+
 
 // Initialize htm with Preact
 const html = htm.bind(h);
@@ -27,8 +26,6 @@ class HistoryElement extends Component {
   
 
 register(HistoryElement);
-
-
 
 
 async function history(historyItem, externalId){
