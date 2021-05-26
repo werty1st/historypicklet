@@ -98,31 +98,32 @@ import mywindow from './window.html';
 
     }
 
+    async function blacklist(ID:string) {
+        alert(`No history picks for ${ID}`);
+    }
 
     async function reLoadCluster(ID){
         console.log("reload ID", ID);
 
         // window.XCustomID = "SCMS_c45739d6-6bd5-4fa2-a29b-5e66dde11fa0"
-        //window.XCustomID = ID;
+        window.XCustomID = ID; //for blacklisting
         const nodeid = "34e6008c-7c5c-402e-ace9-fd3e247f6d97";
 
         var history = [
             {"externalId":ID,"eventDate":"2021-05-24T13:27:05Z","currentPosition":99}
         ]
-
         const plays = encodeURIComponent( JSON.stringify(history) ) ;
-        //const plays = "%5B%7B%22externalId%22%3A%22SCMS_c45739d6-6bd5-4fa2-a29b-5e66dde11fa0%22%2C%22eventDate%22%3A%222021-05-17T12%3A34%3A39.029Z%22%2C%22currentPosition%22%3A2145%7D%2C%7B%22externalId%22%3A%22SCMS_2ed207cc-ed1f-4cfc-822e-b48deaf974e2%22%2C%22eventDate%22%3A%222021-05-06T12%3A21%3A49.859Z%22%2C%22currentPosition%22%3A1.875531%7D%2C%7B%22externalId%22%3A%22SCMS_29ff63da-eac3-441d-9e5d-b856eed167b1%22%2C%22eventDate%22%3A%222021-05-05T16%3A14%3A59Z%22%2C%22currentPosition%22%3A647%7D%2C%7B%22externalId%22%3A%22SCMS_a50fca6d-765d-4f26-94a6-c92f2ab88cd6%22%2C%22eventDate%22%3A%222021-05-04T20%3A08%3A38.234Z%22%2C%22currentPosition%22%3A126%7D%2C%7B%22externalId%22%3A%22SCMS_38a45c56-32f6-4b73-86d9-9c8391bc5049%22%2C%22eventDate%22%3A%222021-04-24T13%3A27%3A05Z%22%2C%22currentPosition%22%3A7%7D%2C%7B%22externalId%22%3A%22SCMS_265182ac-2236-405b-b1eb-93028e21e09d%22%2C%22eventDate%22%3A%222021-03-28T21%3A17%3A39Z%22%2C%22currentPosition%22%3A1%7D%2C%7B%22externalId%22%3A%22SCMS_686fadc4-a803-4aff-8a59-a5730a64302f%22%2C%22eventDate%22%3A%222021-03-24T19%3A27%3A46.446Z%22%2C%22currentPosition%22%3A787.59091%7D%2C%7B%22externalId%22%3A%22SCMS_2f1d20ec-c6a0-4946-92fb-9c86d57a65aa%22%2C%22eventDate%22%3A%222021-03-01T22%3A23%3A05Z%22%2C%22currentPosition%22%3A5241%7D%2C%7B%22externalId%22%3A%22SCMS_c2ddea41-e0f7-41a7-9fa0-a18747cdf9f2%22%2C%22eventDate%22%3A%222021-02-25T18%3A13%3A02Z%22%2C%22currentPosition%22%3A42%7D%2C%7B%22externalId%22%3A%22SCMS_3fc83c22-1137-4114-85c8-e1dcf4eb8bfa%22%2C%22eventDate%22%3A%222021-02-25T17%3A07%3A14Z%22%2C%22currentPosition%22%3A6%7D%5D";
 
-        var parser = new DOMParser();
-        var html = `
+        const parser = new DOMParser();
+        const html = `
         <div class="js-rb-live" data-recommendation-cluster-list-uri="/broker/relay?plays=${plays}&amp;appId={appId}&amp;abGroup={abGroup}&amp;preferences={preferences}&amp;profile=minimal&amp;configuration=history-picks&amp;pageId=SCMS_2fd1b340-e4db-47f2-b55b-633ac4ed1dba&amp;clusterLimit=1"
          data-module="recommendation-cluster-list"
          data-recommendation-cluster-list-nodeid="${nodeid}">
         </div>
         `
 
-        var parsed = parser.parseFromString(html, `text/html`);
-        var newArticle = parsed.querySelector("div");
+        const parsed = parser.parseFromString(html, `text/html`);
+        const newArticle = parsed.querySelector("div");
         let oldArticle;
         if ( oldArticle = document.querySelector( `article[data-node-id="${nodeid}"]` ) ){
             oldArticle.replaceWith(newArticle);
@@ -174,19 +175,25 @@ import mywindow from './window.html';
             var regex1 = /^https:\/\/(api|zdf-int-api)\.(zdf)\.de\/broker\/relay/;
             var _fetch = window.fetch;
             
-            window.fetch = function() {
+            window.fetch = async function() {
                 const url = arguments[0];
                 if (regex1.test(url)) {
             
                     const ID = window.XCustomID; //"SCMS_904a8c10-fdf2-4f20-8075-0f8d5b2c9d5b";
-                    const plays = "plays=" + encodeURIComponent(`[{"externalId":"${ID}","eventDate":"2021-05-24T13:27:05Z","currentPosition":1}]`);
-                    //const plays = "plays=%5B%7B%22externalId%22%3A%22SCMS_c45739d6-6bd5-4fa2-a29b-5e66dde11fa0%22%2C%22eventDate%22%3A%222021-05-17T12%3A34%3A39.029Z%22%2C%22currentPosition%22%3A2145%7D%2C%7B%22externalId%22%3A%22SCMS_2ed207cc-ed1f-4cfc-822e-b48deaf974e2%22%2C%22eventDate%22%3A%222021-05-06T12%3A21%3A49.859Z%22%2C%22currentPosition%22%3A1.875531%7D%2C%7B%22externalId%22%3A%22SCMS_29ff63da-eac3-441d-9e5d-b856eed167b1%22%2C%22eventDate%22%3A%222021-05-05T16%3A14%3A59Z%22%2C%22currentPosition%22%3A647%7D%2C%7B%22externalId%22%3A%22SCMS_a50fca6d-765d-4f26-94a6-c92f2ab88cd6%22%2C%22eventDate%22%3A%222021-05-04T20%3A08%3A38.234Z%22%2C%22currentPosition%22%3A126%7D%2C%7B%22externalId%22%3A%22SCMS_38a45c56-32f6-4b73-86d9-9c8391bc5049%22%2C%22eventDate%22%3A%222021-04-24T13%3A27%3A05Z%22%2C%22currentPosition%22%3A7%7D%2C%7B%22externalId%22%3A%22SCMS_265182ac-2236-405b-b1eb-93028e21e09d%22%2C%22eventDate%22%3A%222021-03-28T21%3A17%3A39Z%22%2C%22currentPosition%22%3A1%7D%2C%7B%22externalId%22%3A%22SCMS_686fadc4-a803-4aff-8a59-a5730a64302f%22%2C%22eventDate%22%3A%222021-03-24T19%3A27%3A46.446Z%22%2C%22currentPosition%22%3A787.59091%7D%2C%7B%22externalId%22%3A%22SCMS_2f1d20ec-c6a0-4946-92fb-9c86d57a65aa%22%2C%22eventDate%22%3A%222021-03-01T22%3A23%3A05Z%22%2C%22currentPosition%22%3A5241%7D%2C%7B%22externalId%22%3A%22SCMS_c2ddea41-e0f7-41a7-9fa0-a18747cdf9f2%22%2C%22eventDate%22%3A%222021-02-25T18%3A13%3A02Z%22%2C%22currentPosition%22%3A42%7D%2C%7B%22externalId%22%3A%22SCMS_3fc83c22-1137-4114-85c8-e1dcf4eb8bfa%22%2C%22eventDate%22%3A%222021-02-25T17%3A07%3A14Z%22%2C%22currentPosition%22%3A6%7D%5D";
-                    const G = "gruppe-c";
-                    const body = `${plays}&appId=exozet-zdf-pd-0.74.7307&abGroup=${G}&preferences=&profile=minimal&configuration=history-picks&pageId=SCMS_2fd1b340-e4db-47f2-b55b-633ac4ed1dba&clusterLimit=1`;
-                    arguments[1].body = body;
+                    // const plays = "plays=" + encodeURIComponent(`[{"externalId":"${ID}","eventDate":"2021-05-24T13:27:05Z","currentPosition":1}]`);
+                    // //const plays = "plays=%5B%7B%22externalId%22%3A%22SCMS_c45739d6-6bd5-4fa2-a29b-5e66dde11fa0%22%2C%22eventDate%22%3A%222021-05-17T12%3A34%3A39.029Z%22%2C%22currentPosition%22%3A2145%7D%2C%7B%22externalId%22%3A%22SCMS_2ed207cc-ed1f-4cfc-822e-b48deaf974e2%22%2C%22eventDate%22%3A%222021-05-06T12%3A21%3A49.859Z%22%2C%22currentPosition%22%3A1.875531%7D%2C%7B%22externalId%22%3A%22SCMS_29ff63da-eac3-441d-9e5d-b856eed167b1%22%2C%22eventDate%22%3A%222021-05-05T16%3A14%3A59Z%22%2C%22currentPosition%22%3A647%7D%2C%7B%22externalId%22%3A%22SCMS_a50fca6d-765d-4f26-94a6-c92f2ab88cd6%22%2C%22eventDate%22%3A%222021-05-04T20%3A08%3A38.234Z%22%2C%22currentPosition%22%3A126%7D%2C%7B%22externalId%22%3A%22SCMS_38a45c56-32f6-4b73-86d9-9c8391bc5049%22%2C%22eventDate%22%3A%222021-04-24T13%3A27%3A05Z%22%2C%22currentPosition%22%3A7%7D%2C%7B%22externalId%22%3A%22SCMS_265182ac-2236-405b-b1eb-93028e21e09d%22%2C%22eventDate%22%3A%222021-03-28T21%3A17%3A39Z%22%2C%22currentPosition%22%3A1%7D%2C%7B%22externalId%22%3A%22SCMS_686fadc4-a803-4aff-8a59-a5730a64302f%22%2C%22eventDate%22%3A%222021-03-24T19%3A27%3A46.446Z%22%2C%22currentPosition%22%3A787.59091%7D%2C%7B%22externalId%22%3A%22SCMS_2f1d20ec-c6a0-4946-92fb-9c86d57a65aa%22%2C%22eventDate%22%3A%222021-03-01T22%3A23%3A05Z%22%2C%22currentPosition%22%3A5241%7D%2C%7B%22externalId%22%3A%22SCMS_c2ddea41-e0f7-41a7-9fa0-a18747cdf9f2%22%2C%22eventDate%22%3A%222021-02-25T18%3A13%3A02Z%22%2C%22currentPosition%22%3A42%7D%2C%7B%22externalId%22%3A%22SCMS_3fc83c22-1137-4114-85c8-e1dcf4eb8bfa%22%2C%22eventDate%22%3A%222021-02-25T17%3A07%3A14Z%22%2C%22currentPosition%22%3A6%7D%5D";
+                    // const G = "gruppe-c";
+                    // const body = `${plays}&appId=exozet-zdf-pd-0.74.7307&abGroup=${G}&preferences=&profile=minimal&configuration=history-picks&pageId=SCMS_2fd1b340-e4db-47f2-b55b-633ac4ed1dba&clusterLimit=1`;
+                    // arguments[1].body = body;
+                    var x = await _fetch.apply(this, arguments)
+                    if (x.status != 200){
+                        blacklist(ID);
+                    }
+                    return  Promise.resolve(x);
                 }
-               return _fetch.apply(this, arguments)
+               return _fetch.apply(this, arguments);
             }
+
             window.f1 = true;
         } else {
             console.warn("fetch installed")
