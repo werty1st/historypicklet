@@ -4,10 +4,11 @@
 
   // app/app.ts
   !async function() {
-    const HOST = "https://werty1st.github.io/historypicklet/dist";
+    const link = "https://werty1st.github.io/historypicklet/dist";
+    const HOST = new URL(link).origin;
     console.log("injected");
     console.log(window_default);
-    const pdoc = window.open(`${HOST}/${window_default}`, "Custom Picks", "width=300,height=600,scrollbars=1,resizable=1");
+    const pdoc = window.open(`${link}/${window_default}`, "Custom Picks", "width=300,height=600,scrollbars=1,resizable=1");
     function getHeaders() {
       const headers = {};
       const user = zdfsite.user;

@@ -1,14 +1,16 @@
-import { type } from 'node:os';
+
 import mywindow from './window.html';
 
 
 !(async function (){
 
-    const HOST = "https://" + process.env.URL;
+    const link = "https://" + process.env.URL;
+
+    const HOST = new URL(link).origin;
 
     console.log("injected");
     console.log(mywindow);
-    const pdoc = window.open(`${HOST}/${mywindow}`,"Custom Picks","width=300,height=600,scrollbars=1,resizable=1");
+    const pdoc = window.open(`${link}/${mywindow}`,"Custom Picks","width=300,height=600,scrollbars=1,resizable=1");
 
     function getHeaders() {
         const headers = {};
