@@ -20,8 +20,8 @@
      "_loader_dev": "esbuild  --minify --define:process.env.URL=\\\"${npm_config_urldev}\\\" app/loader/*.ts --outdir=build --outbase=app",
      "_loader_prod": "esbuild --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/loader/*.ts --outdir=dist --outbase=app",
     
-    "_build_payload1": "esbuild --bundle --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/app.ts app/*.html --loader:.html=file  --outdir=dist --outbase=app",
-    "_build_payload2": "esbuild --minify --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/popup.ts --outdir=dist --outbase=app",
+    "_build_payload1": "esbuild --bundle --minify --sourcemap --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/app.ts app/*.html --loader:.html=file  --outdir=dist --outbase=app",
+    "_build_payload2": "esbuild          --minify --sourcemap --define:process.env.URL=\\\"${npm_config_urlprod}\\\" app/popup.ts                               --outdir=dist --outbase=app",
 
     "build": "npm run clean2 && npm run _loader_prod && npm run _build_payload1 && npm run _build_payload2",
     "lt": "ssh -N -R 5000:localhost:5000 ${npm_config_target}"
