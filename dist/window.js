@@ -1,2 +1,4 @@
-(()=>{var p="./window-5VJUUJNB.html";})();
-//# sourceMappingURL=window.js.map
+(() => {
+  // app/window.html
+  var window_default = "./window-5VJUUJNB.html";
+})();

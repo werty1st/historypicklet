@@ -1,7 +1,141 @@
-(()=>{var d="./window-5VJUUJNB.html";(async function(){let c="https://werty1st.github.io/historypicklet/dist";console.log("injected"),console.log(d);let u=window.open(`${c}/${d}`,"Custom Picks","width=300,height=600,scrollbars=1,resizable=1");function m(){let t={},o=zdfsite.user;t["Api-Auth"]="Bearer "+zdfsite.apiToken;let s=o.getState().token;return s&&!o.getState().profile.deactivatePersonalRecommendations&&(t.Authorization=`Bearer ${s}`),t["Content-Type"]="application/x-www-form-urlencoded",t}async function f(t){let o={};o.method="GET",o.headers=m();let s=`https://api.zdf.de/content/embed/${t}.json?profile=player2`,e=await fetch(s,o);return e.ok?{doc:await e.json(),err:null}:(console.error(`${e.status} - ${e.statusText} (for url ${s})`),{doc:null,err:e.status})}async function p(t,o){console.log(`Name: ${o}, ID: ${t}`),u.postMessage({history:o,externalId:t,datatype:"json"},c)}async function y(){let t=zdfsite.user.getPlaybackHistory().getItems().sort(({eventDate:e},{eventDate:n})=>(r,i)=>(new Date(i)-new Date(r))(r,i)),s=!1?t.slice(0,4):t;for await(let e of s){let n=localStorage.getItem(e.externalId);if(n==null||n=="{}"||n==""){let{doc:r,err:i}=await f(e.externalId);if(r){let a=JSON.stringify({leadParagraph:r.leadParagraph,title:r.title});localStorage.setItem(e.externalId,a),p(e.externalId,a)}}else try{let r=JSON.parse(n);console.log(r),p(e.externalId,n)}catch(r){localStorage.removeItem(e.externalId)}}}async function h(t){alert(`No history picks for ${t}`)}async function w(t){console.log("reload ID",t),window.XCustomID=t;let o="34e6008c-7c5c-402e-ace9-fd3e247f6d97";var s=[{externalId:t,eventDate:"2021-05-24T13:27:05Z",currentPosition:99}];let e=encodeURIComponent(JSON.stringify(s)),n=new DOMParser,r=`
-        <div class="js-rb-live" data-recommendation-cluster-list-uri="/broker/relay?plays=${e}&amp;appId={appId}&amp;abGroup={abGroup}&amp;preferences={preferences}&amp;profile=minimal&amp;configuration=history-picks&amp;pageId=SCMS_2fd1b340-e4db-47f2-b55b-633ac4ed1dba&amp;clusterLimit=1"
+(() => {
+  // app/window.html
+  var window_default = "./window-5VJUUJNB.html";
+
+  // app/app.ts
+  !async function() {
+    const HOST = "https://werty1st.github.io/historypicklet/dist";
+    console.log("injected");
+    console.log(window_default);
+    const pdoc = window.open(`${HOST}/${window_default}`, "Custom Picks", "width=300,height=600,scrollbars=1,resizable=1");
+    function getHeaders() {
+      const headers = {};
+      const user = zdfsite.user;
+      headers["Api-Auth"] = "Bearer " + zdfsite.apiToken;
+      const token = user.getState().token;
+      if (token && !user.getState().profile.deactivatePersonalRecommendations) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      headers["Content-Type"] = "application/x-www-form-urlencoded";
+      return headers;
+    }
+    async function resolveId(externalId) {
+      const options = {};
+      options["method"] = "GET";
+      options["headers"] = getHeaders();
+      const url = `https://api.zdf.de/content/embed/${externalId}.json?profile=player2`;
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        console.error(`${response.status} - ${response.statusText} (for url ${url})`);
+        return { doc: null, err: response.status };
+      } else {
+        return { doc: await response.json(), err: null };
+      }
+    }
+    async function postPopup(externalId, payload) {
+      console.log(`Name: ${payload}, ID: ${externalId}`);
+      pdoc.postMessage({ history: payload, externalId, datatype: "json" }, HOST);
+    }
+    async function resolveHistoryItems() {
+      const history = zdfsite.user.getPlaybackHistory().getItems().sort(({ eventDate: a }, { eventDate: b }) => (a2, b2) => (new Date(b2) - new Date(a2))(a2, b2));
+      const DEBUG = false;
+      const data = DEBUG ? history.slice(0, 4) : history;
+      for await (const entry of data) {
+        const cacheJson = localStorage.getItem(entry.externalId);
+        if (!(cacheJson == void 0 || cacheJson == "{}" || cacheJson == "")) {
+          try {
+            let tempjson = JSON.parse(cacheJson);
+            console.log(tempjson);
+            postPopup(entry.externalId, cacheJson);
+          } catch (error) {
+            localStorage.removeItem(entry.externalId);
+          }
+        } else {
+          const { doc, err } = await resolveId(entry.externalId);
+          if (doc) {
+            const newJson = JSON.stringify({
+              leadParagraph: doc.leadParagraph,
+              title: doc.title
+            });
+            localStorage.setItem(entry.externalId, newJson);
+            postPopup(entry.externalId, newJson);
+          } else {
+          }
+        }
+      }
+    }
+    async function blacklist(ID) {
+      alert(`No history picks for ${ID}`);
+    }
+    async function reLoadCluster(ID) {
+      console.log("reload ID", ID);
+      window.XCustomID = ID;
+      const nodeid = "34e6008c-7c5c-402e-ace9-fd3e247f6d97";
+      var history = [
+        { "externalId": ID, "eventDate": "2021-05-24T13:27:05Z", "currentPosition": 99 }
+      ];
+      const plays = encodeURIComponent(JSON.stringify(history));
+      const parser = new DOMParser();
+      const html = `
+        <div class="js-rb-live" data-recommendation-cluster-list-uri="/broker/relay?plays=${plays}&amp;appId={appId}&amp;abGroup={abGroup}&amp;preferences={preferences}&amp;profile=minimal&amp;configuration=history-picks&amp;pageId=SCMS_2fd1b340-e4db-47f2-b55b-633ac4ed1dba&amp;clusterLimit=1"
          data-module="recommendation-cluster-list"
-         data-recommendation-cluster-list-nodeid="${o}">
+         data-recommendation-cluster-list-nodeid="${nodeid}">
         </div>
-        `,a=n.parseFromString(r,"text/html").querySelector("div"),l;(l=document.querySelector(`article[data-node-id="${o}"]`))?l.replaceWith(a):(l=document.querySelector(".sb-page > article"),l.nextElementSibling.prepend(a))}async function g(){y()}function b(){if(window.l1?(window.l1=!0,console.log("parent listener exists")):(window.addEventListener("message",s=>{if(s.origin==c)try{let e=JSON.parse(s.data);e.message==="ready"?g():e.message==="reload"&&w(e.id)}catch(e){console.error("Payload not json")}},!1),console.log("parent listener installed")),window.f1)console.warn("fetch installed");else{var t=/^https:\/\/(api|zdf-int-api)\.(zdf)\.de\/broker\/relay/,o=window.fetch;window.fetch=async function(){let s=arguments[0];if(t.test(s)){let n=window.XCustomID;var e=await o.apply(this,arguments);return e.status!=200&&h(n),Promise.resolve(e)}return o.apply(this,arguments)},window.f1=!0}}b()})();})();
-//# sourceMappingURL=app.js.map
+        `;
+      const parsed = parser.parseFromString(html, `text/html`);
+      const newArticle = parsed.querySelector("div");
+      let oldArticle;
+      if (oldArticle = document.querySelector(`article[data-node-id="${nodeid}"]`)) {
+        oldArticle.replaceWith(newArticle);
+      } else {
+        oldArticle = document.querySelector(".sb-page > article");
+        oldArticle.nextElementSibling.prepend(newArticle);
+      }
+    }
+    async function ready() {
+      resolveHistoryItems();
+    }
+    function init() {
+      if (!window.l1) {
+        window.addEventListener("message", (event) => {
+          if (event.origin == HOST) {
+            try {
+              const payload = JSON.parse(event.data);
+              if (payload.message === "ready") {
+                ready();
+              } else if (payload.message === "reload") {
+                reLoadCluster(payload.id);
+              }
+            } catch (error) {
+              console.error("Payload not json");
+            }
+          }
+        }, false);
+        console.log("parent listener installed");
+      } else {
+        window.l1 = true;
+        console.log("parent listener exists");
+      }
+      if (!window.f1) {
+        var regex1 = /^https:\/\/(api|zdf-int-api)\.(zdf)\.de\/broker\/relay/;
+        var _fetch = window.fetch;
+        window.fetch = async function() {
+          const url = arguments[0];
+          if (regex1.test(url)) {
+            const ID = window.XCustomID;
+            var x = await _fetch.apply(this, arguments);
+            if (x.status != 200) {
+              blacklist(ID);
+            }
+            return Promise.resolve(x);
+          }
+          return _fetch.apply(this, arguments);
+        };
+        window.f1 = true;
+      } else {
+        console.warn("fetch installed");
+      }
+    }
+    init();
+  }();
+})();

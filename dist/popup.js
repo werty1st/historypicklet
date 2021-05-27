@@ -1,4 +1,51 @@
-import{h as r,Component as a}from"https://unpkg.com/preact?module";import d from"https://unpkg.com/preact-custom-element?module";import l from"https://unpkg.com/htm?module";const m=l.bind(r);class o extends a{constructor(){super(...arguments);this.onClick=i=>{window.opener.postMessage(JSON.stringify({message:"reload",id:this.props.scmsid}),"https://www.zdf.de/")}}render({scmsid:i,title:e,leadParagraph:n}){return e||(e="loading..."),m`<li onClick=${this.onClick} >
-        <a href="#"> ${e} </a>
-        </li>`}}o.tagName="history-element",o.observedAttributes=["scmsid","lead-paragraph","title"],d(o);async function c(t,i){const e=JSON.parse(t),n=document.getElementById("historylist");let s=document.createElement("history-element");s.setAttribute("scmsid",i),s.setAttribute("lead-paragraph",e.leadParagraph),s.setAttribute("title",e.title),n.appendChild(s)}function p(){window.l1?(window.l1=!0,console.log("listener exists")):(window.addEventListener("message",t=>{t.origin=="https://www.zdf.de"&&(t.data.history&&c(t.data.history,t.data.externalId),console.log(t))}),document.addEventListener("DOMContentLoaded",function(){window.opener.postMessage(JSON.stringify({message:"ready"}),"https://www.zdf.de/")}),console.log("listener installed"))}p();
-//# sourceMappingURL=popup.js.map
+import { h, Component } from "https://unpkg.com/preact?module";
+import register from "https://unpkg.com/preact-custom-element?module";
+import htm from "https://unpkg.com/htm?module";
+const html = htm.bind(h);
+class HistoryElement extends Component {
+  constructor() {
+    super(...arguments);
+    this.onClick = (e) => {
+      window.opener.postMessage(JSON.stringify({ message: "reload", id: this.props.scmsid }), "https://www.zdf.de/");
+    };
+  }
+  render({ scmsid, title, leadParagraph }) {
+    if (!title)
+      title = "loading...";
+    return html`<li onClick=${this.onClick} >
+        <a href="#"> ${title} </a>
+        </li>`;
+  }
+}
+HistoryElement.tagName = "history-element";
+HistoryElement.observedAttributes = ["scmsid", "lead-paragraph", "title"];
+register(HistoryElement);
+async function history(historyItem, externalId) {
+  const data = JSON.parse(historyItem);
+  const ul = document.getElementById("historylist");
+  let li = document.createElement("history-element");
+  li.setAttribute("scmsid", externalId);
+  li.setAttribute("lead-paragraph", data.leadParagraph);
+  li.setAttribute("title", data.title);
+  ul.appendChild(li);
+}
+function installListener() {
+  if (!window.l1) {
+    window.addEventListener("message", (event) => {
+      if (event.origin == "https://www.zdf.de") {
+        if (event.data.history) {
+          history(event.data.history, event.data.externalId);
+        }
+        console.log(event);
+      }
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+      window.opener.postMessage(JSON.stringify({ message: "ready" }), "https://www.zdf.de/");
+    });
+    console.log("listener installed");
+  } else {
+    window.l1 = true;
+    console.log("listener exists");
+  }
+}
+installListener();
